@@ -1,4 +1,4 @@
-name: junit-platform-native-feature
+name: "Test junit-platform-native"
 
 on:
   push:
@@ -10,28 +10,28 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-junit-platform-native-feature:
-    name:
-    runs-on: ubuntu-18.04
+  test-junit-platform-native:
+    name: "Test junit-platform-native"
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
+      matrix:
+        graalvm-version: [ dev ]
+        java-version: [ 11 ]
+        os: [ ubuntu-20.04 ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: ./.github/actions/prepare-environment
         with:
-          fetch-depth: 1
-      - uses: graalvm/setup-graalvm@v1
-        with:
-          version: 'dev'
-          java-version: '11'
-          components: 'native-image'
+          version: ${{ matrix.graalvm-version }}
+          java-version: ${{ matrix.java-version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Checkstyle
+      - name: "❓ Checkstyle"
         run: ./gradlew :junit-platform-native:checkstyleMain :junit-platform-native:checkstyleTest
-      - name: JVM test
+      - name: "❓ Hotspot test"
         run: ./gradlew :junit-platform-native:test
-      - name: Feature test
+      - name: "❓ Native test"
         run: ./gradlew :junit-platform-native:nativeTest
-      - name: Tests results
+      - name: "📜 Upload tests results"
         if: always()
         uses: actions/upload-artifact@v2
         with:

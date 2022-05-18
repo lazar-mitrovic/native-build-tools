@@ -1,4 +1,4 @@
-name: JVM Reachability Metadata Repository
+name: "Test GraalVM Reachability Metadata Repository"
 
 on:
   push:
@@ -10,26 +10,26 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-jvm-reachability-metadata:
-    name:
-    runs-on: ubuntu-18.04
+  test-graalvm-reachability-metadata:
+    name: "Test GraalVM Reachability Metadata"
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
+      matrix:
+        graalvm-version: [ dev ]
+        java-version: [ 11 ]
+        os: [ ubuntu-20.04 ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: ./.github/actions/prepare-environment
         with:
-          fetch-depth: 1
-      - uses: graalvm/setup-graalvm@v1
-        with:
-          version: 'dev'
-          java-version: '11'
-          components: 'native-image'
+          version: ${{ matrix.graalvm-version }}
+          java-version: ${{ matrix.java-version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Checkstyle
+      - name: "❓ Checkstyle"
         run: ./gradlew :jvm-reachability-metadata:checkstyleMain :jvm-reachability-metadata:checkstyleTest
-      - name: JVM test
+      - name: "❓ GraalVM Reachability Metadata test"
         run: ./gradlew :jvm-reachability-metadata:test
-      - name: Tests results
+      - name: "📜 Upload tests results"
         if: always()
         uses: actions/upload-artifact@v2
         with:

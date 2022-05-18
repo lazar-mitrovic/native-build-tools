@@ -1,0 +1,30 @@
+name: "Deploy snapshots"
+
+on:
+  workflow_run:
+    workflows: [ "documentation", "native-gradle-plugin", "native-maven-plugin", "junit-platform-native-feature" ]
+    branches: [ "master" ]
+    types:
+      - completed
+
+jobs:
+  deploy-snapshots:
+    name: "Build and deploy snapshots"
+    if: ${{ false }}  # Disable for now
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        graalvm-version: [ dev ]
+        java-version: [ 11 ]
+        os: [ ubuntu-20.04 ]
+    steps:
+      - uses: ./.github/actions/prepare-environment
+        with:
+          push-access: 1
+          version: ${{ matrix.graalvm-version }}
+          java-version: ${{ matrix.java-version }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: "🌍 Build and publish snapshots"
+        run: |
+          ./gradlew publishAllPublicationsToSnapshotsRepository --no-parallel

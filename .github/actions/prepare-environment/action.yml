@@ -1,0 +1,56 @@
+name: '🔧 Prepare environment'
+description: 'Prepare the environment for testing'
+
+inputs:
+  push-access:
+    description: 'Does this workflow require push access?'
+    required: false
+    default: '0'
+  java-version:
+    description: 'Java version to use'
+    required: false
+    default: '11'
+  graalvm-version:
+    description: 'GraalVM version to use'
+    required: false
+    default: 'dev'
+  github-token:
+    description: 'secrets.GITHUB_TOKEN'
+    required: false
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+    - name: "☁️Checkout repository"
+      uses: actions/checkout@v2
+    - name: "🔧 Install GraalVM ${{ inputs.graalvm-version }} (JDK${{ inputs.java-version }})"
+      uses: graalvm/setup-graalvm@master
+      with:
+        version: ${{ inputs.graalvm-version }}
+        java-version: ${{ inputs.java-version }}
+        components: 'native-image'
+        github-token: ${{ inputs.github-token }}
+    - name: "🔒 Configure push access (1/2)"
+      if: ${{ inputs.push-access }}
+      uses: actions/checkout@v2
+      with:
+        ssh-key: "${{ secrets.SSH_PRIVATE_KEY }}"
+    - name: "🔒 Configure push access (2/2)"
+      if: ${{ inputs.push-access }}
+      shell: "bash"
+      env:
+        GIT_SSH_COMMAND: "ssh -o StrictHostKeyChecking=no"
+        GIT_SSH: "ssh"
+        SSH_PRIVATE_KEY: "${{ secrets.SSH_PRIVATE_KEY }}"
+      run: |
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 700 -R ~/.ssh
+        ssh-keygen -p -f ~/.ssh/id_rsa -m pem
+        eval "$(ssh-agent -s)"
+        ssh-add
+        ssh git@github.com || true
+        git config --global user.name 'graalvm bot'
+        git config --global user.email 'graalvmbot@users.noreply.github.com'
+        echo "org.ajoberstar.grgit.auth.command.allow=true" >> gradle.properties
