@@ -386,6 +386,10 @@ public abstract class AbstractNativeMojo extends AbstractMojo {
     }
 
     protected void buildImage() throws MojoExecutionException {
+        logger.info("====================");
+        logger.info("Building image for project: " + project.getName());
+        logger.info("====================");
+
         Path nativeImageExecutable = Utils.getNativeImage(logger);
 
         try {

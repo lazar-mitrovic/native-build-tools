@@ -59,6 +59,8 @@ public interface SharedConstants {
     String NATIVE_IMAGE_EXE = "native-image" + GRAALVM_EXE_EXTENSION;
     String GU_EXE = "gu" + GRAALVM_EXE_EXTENSION;
     String NATIVE_IMAGE_OUTPUT_FOLDER = "native";
+    String NATIVEIMAGE_IMAGECODE = "org.graalvm.nativeimage.imagecode";
+    String NATIVEIMAGE_IMAGECODE_AGENT_VALUE = "agent";
     String AGENT_PROPERTY = "agent";
     String AGENT_OUTPUT_FOLDER = NATIVE_IMAGE_OUTPUT_FOLDER + "/agent-output";
     String NATIVE_TESTS_SUFFIX = "-tests";
@@ -76,4 +78,6 @@ public interface SharedConstants {
     String AGENT_OUTPUT_DIRECTORY_MARKER = "{output_dir}";
     String AGENT_OUTPUT_DIRECTORY_OPTION = "config-output-dir=";
     String METADATA_REPO_URL_TEMPLATE = "https://github.com/graalvm/graalvm-reachability-metadata/releases/download/%1$s/graalvm-reachability-metadata-%1$s.zip";
+    String JUNIT_PLATFORM_LISTENERS_UID_TRACKING_ENABLED = "junit.platform.listeners.uid.tracking.enabled";
+    String JUNIT_PLATFORM_LISTENERS_UID_TRACKING_OUTPUT_DIR = "junit.platform.listeners.uid.tracking.output.dir";
 }

@@ -62,6 +62,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.graalvm.buildtools.utils.SharedConstants.AGENT_OUTPUT_DIRECTORY_MARKER;
+import static org.graalvm.buildtools.utils.SharedConstants.NATIVEIMAGE_IMAGECODE;
+import static org.graalvm.buildtools.utils.SharedConstants.NATIVEIMAGE_IMAGECODE_AGENT_VALUE;
 
 public abstract class AgentCommandLineProvider implements CommandLineArgumentProvider {
 
@@ -97,7 +99,7 @@ public abstract class AgentCommandLineProvider implements CommandLineArgumentPro
             List<String> agentOptions = getAgentOptions().get().stream().map(opt -> opt.replace(AGENT_OUTPUT_DIRECTORY_MARKER, outputDirPath)).collect(Collectors.toList());
             return Arrays.asList(
                     "-agentlib:native-image-agent=" + String.join(",", agentOptions),
-                    "-Dorg.graalvm.nativeimage.imagecode=agent"
+                    "-D" + NATIVEIMAGE_IMAGECODE + "=" + NATIVEIMAGE_IMAGECODE_AGENT_VALUE
             );
         }
         return Collections.emptyList();

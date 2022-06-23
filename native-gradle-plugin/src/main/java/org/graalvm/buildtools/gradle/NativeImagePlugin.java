@@ -129,6 +129,8 @@ import static org.graalvm.buildtools.gradle.internal.GradleUtils.transitiveProje
 import static org.graalvm.buildtools.gradle.internal.NativeImageExecutableLocator.graalvmHomeProvider;
 import static org.graalvm.buildtools.utils.SharedConstants.AGENT_PROPERTY;
 import static org.graalvm.buildtools.utils.SharedConstants.IS_WINDOWS;
+import static org.graalvm.buildtools.utils.SharedConstants.JUNIT_PLATFORM_LISTENERS_UID_TRACKING_ENABLED;
+import static org.graalvm.buildtools.utils.SharedConstants.JUNIT_PLATFORM_LISTENERS_UID_TRACKING_OUTPUT_DIR;
 import static org.graalvm.buildtools.utils.SharedConstants.METADATA_REPO_URL_TEMPLATE;
 
 /**
@@ -144,12 +146,7 @@ public class NativeImagePlugin implements Plugin<Project> {
     public static final String DEPRECATED_NATIVE_TEST_EXTENSION = "nativeTest";
     public static final String DEPRECATED_NATIVE_BUILD_TASK = "nativeBuild";
     public static final String DEPRECATED_NATIVE_TEST_BUILD_TASK = "nativeTestBuild";
-
     public static final String CONFIG_REPO_LOGLEVEL = "org.graalvm.internal.gradle.configrepo.logging";
-
-    private static final String JUNIT_PLATFORM_LISTENERS_UID_TRACKING_ENABLED = "junit.platform.listeners.uid.tracking.enabled";
-    private static final String JUNIT_PLATFORM_LISTENERS_UID_TRACKING_OUTPUT_DIR = "junit.platform.listeners.uid.tracking.output.dir";
-
     private GraalVMLogger logger;
 
     @Inject

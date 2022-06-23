@@ -130,12 +130,8 @@ public class NativeTestMojo extends AbstractNativeMojo {
             throw new IllegalStateException("Test configuration file wasn't found.");
         }
 
-        logger.info("====================");
-        logger.info("Initializing project: " + project.getName());
-        logger.info("====================");
-
         configureEnvironment();
-        buildArgs.add("--features=org.graalvm.junit.platform.JUnitPlatformFeature");
+        buildArgs.add("--features=" + org.graalvm.junit.platform.JUnitPlatformFeature.class.getCanonicalName());
 
         if (systemProperties == null) {
             systemProperties = new HashMap<>();
@@ -144,7 +140,7 @@ public class NativeTestMojo extends AbstractNativeMojo {
                 NativeExtension.testIdsDirectory(outputDirectory.getAbsolutePath()));
 
         imageName = NATIVE_TESTS_EXE;
-        mainClass = "org.graalvm.junit.platform.NativeImageJUnitLauncher";
+        mainClass = org.graalvm.junit.platform.NativeImageJUnitLauncher.class.getCanonicalName();
 
         buildImage();
         runNativeTests(outputDirectory.toPath().resolve(NATIVE_TESTS_EXE));

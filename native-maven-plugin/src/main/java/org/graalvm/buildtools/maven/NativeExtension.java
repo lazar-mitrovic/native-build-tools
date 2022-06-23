@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, 2021 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020, 2022 Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * The Universal Permissive License (UPL), Version 1.0
@@ -62,16 +62,17 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static org.graalvm.buildtools.utils.SharedConstants.JUNIT_PLATFORM_LISTENERS_UID_TRACKING_ENABLED;
+import static org.graalvm.buildtools.utils.SharedConstants.JUNIT_PLATFORM_LISTENERS_UID_TRACKING_OUTPUT_DIR;
+import static org.graalvm.buildtools.utils.SharedConstants.NATIVEIMAGE_IMAGECODE;
+import static org.graalvm.buildtools.utils.SharedConstants.NATIVEIMAGE_IMAGECODE_AGENT_VALUE;
+
 /**
  * This extension is responsible for configuring the Surefire plugin to enable
  * the JUnit Platform test listener and registering the native dependency transparently.
  */
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = "native-build-tools")
 public class NativeExtension extends AbstractMavenLifecycleParticipant implements LogEnabled {
-
-    private static final String JUNIT_PLATFORM_LISTENERS_UID_TRACKING_ENABLED = "junit.platform.listeners.uid.tracking.enabled";
-    private static final String JUNIT_PLATFORM_LISTENERS_UID_TRACKING_OUTPUT_DIR = "junit.platform.listeners.uid.tracking.output.dir";
-    private static final String NATIVEIMAGE_IMAGECODE = "org.graalvm.nativeimage.imagecode";
 
     private Logger logger;
 
@@ -153,7 +154,7 @@ public class NativeExtension extends AbstractMavenLifecycleParticipant implement
 
                                     // System property for org.graalvm.nativeimage.imagecode
                                     arg = new Xpp3Dom("argument");
-                                    arg.setValue("-D" + NATIVEIMAGE_IMAGECODE + "=agent");
+                                    arg.setValue("-D" + NATIVEIMAGE_IMAGECODE + "=" + NATIVEIMAGE_IMAGECODE_AGENT_VALUE);
                                     children.add(1, arg);
 
                                     for (Xpp3Dom child : children) {
