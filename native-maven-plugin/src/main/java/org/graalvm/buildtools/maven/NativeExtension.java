@@ -119,6 +119,7 @@ public class NativeExtension extends AbstractMavenLifecycleParticipant implement
         for (MavenProject project : session.getProjects()) {
             Build build = project.getBuild();
             withPlugin(build, "native-maven-plugin", nativePlugin -> {
+
                 String target = build.getDirectory();
                 String testIdsDir = testIdsDirectory(target);
                 boolean isAgentEnabled = isAgentEnabled(session, nativePlugin);

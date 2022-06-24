@@ -43,7 +43,6 @@ package org.graalvm.buildtools.maven;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -53,8 +52,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.toolchain.ToolchainManager;
 import org.codehaus.plexus.logging.Logger;
 import org.graalvm.buildtools.Utils;
-import org.graalvm.buildtools.maven.config.ExcludeConfigConfiguration;
-import org.graalvm.buildtools.maven.config.MetadataRepositoryConfiguration;
+import org.graalvm.buildtools.maven.config.NativeConfiguration;
 import org.graalvm.buildtools.utils.FileUtils;
 import org.graalvm.buildtools.utils.NativeImageUtils;
 import org.graalvm.buildtools.utils.SharedConstants;
@@ -91,103 +89,29 @@ import static org.graalvm.buildtools.utils.SharedConstants.METADATA_REPO_URL_TEM
  * @author Sebastien Deleuze
  */
 
-public abstract class AbstractNativeMojo extends AbstractMojo {
-    protected static final String NATIVE_IMAGE_META_INF = "META-INF/native-image";
-    protected static final String NATIVE_IMAGE_PROPERTIES_FILENAME = "native-image.properties";
-    protected static final String NATIVE_IMAGE_DRY_RUN = "nativeDryRun";
-
+public abstract class AbstractNativeMojo extends NativeConfiguration {
+    // Maven's auto-injected parameters and components
     @Parameter(defaultValue = "${plugin}", readonly = true) // Maven 3 only
     protected PluginDescriptor plugin;
-
     @Parameter(defaultValue = "${session}", readonly = true)
     protected MavenSession session;
-
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     protected MavenProject project;
-
     @Parameter(defaultValue = "${mojoExecution}")
     protected MojoExecution mojoExecution;
-
     @Parameter(property = "plugin.artifacts", required = true, readonly = true)
     protected List<Artifact> pluginArtifacts;
-
-    @Parameter(defaultValue = "${project.build.directory}", property = "outputDir", required = true)
-    protected File outputDirectory;
-
-    @Parameter(property = "mainClass")
-    protected String mainClass;
-
-    @Parameter(property = "imageName", defaultValue = "${project.artifactId}")
-    protected String imageName;
-
-    @Parameter(property = "classpath")
-    protected List<String> classpath;
-
-    @Parameter(property = "classesDirectory")
-    protected File classesDirectory;
-
-    @Parameter(defaultValue = "${project.build.outputDirectory}", readonly = true, required = true)
-    protected File defaultClassesDirectory;
-
-    protected final List<Path> imageClasspath;
-
-    protected final Set<Path> metadataRepositoryPaths;
-
-    @Parameter(property = "debug", defaultValue = "false")
-    protected boolean debug;
-
-    @Parameter(property = "fallback", defaultValue = "false")
-    protected boolean fallback;
-
-    @Parameter(property = "verbose", defaultValue = "false")
-    protected boolean verbose;
-
-    @Parameter(property = "sharedLibrary", defaultValue = "false")
-    protected boolean sharedLibrary;
-
-    @Parameter(property = "quickBuild", defaultValue = "false")
-    protected boolean quickBuild;
-
-    @Parameter(property = "useArgFile")
-    protected Boolean useArgFile;
-
-    @Parameter(property = "buildArgs")
-    protected List<String> buildArgs;
-
-    @Parameter(defaultValue = "${project.build.directory}/native/generated", property = "resourcesConfigDirectory", required = true)
-    protected File resourcesConfigDirectory;
-
-    @Parameter(property = "agentResourceDirectory")
-    protected File agentResourceDirectory;
-
-    @Parameter(property = "excludeConfig")
-    protected List<ExcludeConfigConfiguration> excludeConfig;
-
-    @Parameter(property = "environmentVariables")
-    protected Map<String, String> environment;
-
-    @Parameter(property = "systemPropertyVariables")
-    protected Map<String, String> systemProperties;
-
-    @Parameter(property = "configurationFileDirectories")
-    protected List<String> configFiles;
-
-    @Parameter(property = "jvmArgs")
-    protected List<String> jvmArgs;
-
-    @Parameter(alias = "metadataRepository")
-    protected MetadataRepositoryConfiguration metadataRepositoryConfiguration;
-
-    @Parameter(property = NATIVE_IMAGE_DRY_RUN, defaultValue = "false")
-    protected boolean dryRun;
-
-    protected GraalVMReachabilityMetadataRepository metadataRepository;
-
     @Component
     protected Logger logger;
-
     @Component
     protected ToolchainManager toolchainManager;
+
+    protected static final String NATIVE_IMAGE_META_INF = "META-INF/native-image";
+    protected static final String NATIVE_IMAGE_PROPERTIES_FILENAME = "native-image.properties";
+
+    protected List<Path> imageClasspath;
+    protected Set<Path> metadataRepositoryPaths;
+    protected GraalVMReachabilityMetadataRepository metadataRepository;
 
     @Inject
     protected AbstractNativeMojo() {
@@ -253,10 +177,10 @@ public abstract class AbstractNativeMojo extends AbstractMojo {
         if (configFiles != null && !configFiles.isEmpty()) {
             cliArgs.add("-H:ConfigurationFileDirectories=" +
                     configFiles.stream()
-                    .map(Paths::get)
-                    .map(Path::toAbsolutePath)
-                    .map(Path::toString)
-                    .collect(Collectors.joining(","))
+                            .map(Paths::get)
+                            .map(Path::toAbsolutePath)
+                            .map(Path::toString)
+                            .collect(Collectors.joining(","))
             );
         }
 
@@ -341,6 +265,7 @@ public abstract class AbstractNativeMojo extends AbstractMojo {
 
     /**
      * Returns path to where application classes are stored, or jar artifact if it is produced.
+     *
      * @return Path to application classes
      * @throws MojoExecutionException failed getting main build path
      */
@@ -410,7 +335,7 @@ public abstract class AbstractNativeMojo extends AbstractMojo {
             logger.info("Executing: " + commandString);
 
             if (dryRun) {
-                logger.warn("Skipped native-image building due to `" + NATIVE_IMAGE_DRY_RUN + "` being specified.");
+                logger.warn("Skipped native-image building due to dry run option being specified.");
                 return;
             }
 
